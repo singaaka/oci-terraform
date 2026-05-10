@@ -2,8 +2,7 @@ name: Terraform Apply
 
 on:
   schedule:
-    # GitHub's minimum scheduled interval is 5 minutes; '* * * * *' is clamped to that.
-    - cron: '* * * * *'
+    - cron: "*/5 * * * *"
   workflow_dispatch:
 
 jobs:
