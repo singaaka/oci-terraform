@@ -1,9 +1,7 @@
 default:
     @just --list
 
-# Encrypt secrets.tfvars -> secrets.tfvars.age
-# Locally: prompts for passphrase interactively
-# In CI: reads passphrase from AGE_PASSPHRASE env var
+# Encrypt secrets.tfvars into secrets.tfvars.age (interactive locally, AGE_PASSPHRASE env var in CI)
 encrypt:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -13,9 +11,7 @@ encrypt:
         age --passphrase -o secrets.tfvars.age secrets.tfvars
     fi
 
-# Decrypt secrets.tfvars.age -> secrets.tfvars
-# Locally: prompts for passphrase interactively
-# In CI: reads passphrase from AGE_PASSPHRASE env var
+# Decrypt secrets.tfvars.age into secrets.tfvars (interactive locally, AGE_PASSPHRASE env var in CI)
 decrypt:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -25,26 +21,26 @@ decrypt:
         age --decrypt -o secrets.tfvars secrets.tfvars.age
     fi
 
-# Inject S3 backend credentials from secrets.tfvars as env vars, then run tofu init
-init: decrypt
+# Initialise the OpenTofu backend (run decrypt first)
+init:
     #!/usr/bin/env bash
     set -euo pipefail
     export AWS_ACCESS_KEY_ID=$(grep '^access_key' secrets.tfvars | awk -F'"' '{print $2}')
     export AWS_SECRET_ACCESS_KEY=$(grep '^secret_key' secrets.tfvars | awk -F'"' '{print $2}')
     tofu init
 
-# Inject S3 backend credentials from secrets.tfvars as env vars, then run tofu plan
-plan: decrypt
+# Show the execution plan (run decrypt first)
+plan:
     #!/usr/bin/env bash
     set -euo pipefail
     export AWS_ACCESS_KEY_ID=$(grep '^access_key' secrets.tfvars | awk -F'"' '{print $2}')
     export AWS_SECRET_ACCESS_KEY=$(grep '^secret_key' secrets.tfvars | awk -F'"' '{print $2}')
     tofu plan -var-file=secrets.tfvars
 
-# Inject S3 backend credentials from secrets.tfvars as env vars, then run tofu apply
-apply *ARGS: decrypt
+# Apply the configuration; extra flags are forwarded (e.g. just apply -auto-approve)
+apply *ARGS:
     #!/usr/bin/env bash
     set -euo pipefail
     export AWS_ACCESS_KEY_ID=$(grep '^access_key' secrets.tfvars | awk -F'"' '{print $2}')
     export AWS_SECRET_ACCESS_KEY=$(grep '^secret_key' secrets.tfvars | awk -F'"' '{print $2}')
-    tofu apply -var-file=secrets.tfvars {{ARGS}}
+    tofu apply -var-file=secrets.tfvars {{ ARGS }}

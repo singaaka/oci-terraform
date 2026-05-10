@@ -1,0 +1,32 @@
+name: Terraform Apply
+
+on:
+  schedule:
+    # GitHub's minimum scheduled interval is 5 minutes; '* * * * *' is clamped to that.
+    - cron: '* * * * *'
+  workflow_dispatch:
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: extractions/setup-just@v2
+
+      - name: Install age
+        run: sudo apt-get install -y age
+
+      - uses: opentofu/setup-opentofu@v1
+
+      - name: Decrypt secrets
+        env:
+          AGE_PASSPHRASE: ${{ secrets.AGE_PASSPHRASE }}
+        run: just decrypt
+
+      - name: Init
+        run: just init
+
+      - name: Apply
+        run: just apply -auto-approve
