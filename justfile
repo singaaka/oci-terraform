@@ -1,3 +1,6 @@
+default:
+    @just --list
+
 # Encrypt secrets.tfvars -> secrets.tfvars.age
 # Locally: prompts for passphrase interactively
 # In CI: reads passphrase from AGE_PASSPHRASE env var
@@ -39,9 +42,9 @@ plan: decrypt
     tofu plan -var-file=secrets.tfvars
 
 # Inject S3 backend credentials from secrets.tfvars as env vars, then run tofu apply
-apply: decrypt
+apply *ARGS: decrypt
     #!/usr/bin/env bash
     set -euo pipefail
     export AWS_ACCESS_KEY_ID=$(grep '^access_key' secrets.tfvars | awk -F'"' '{print $2}')
     export AWS_SECRET_ACCESS_KEY=$(grep '^secret_key' secrets.tfvars | awk -F'"' '{print $2}')
-    tofu apply -var-file=secrets.tfvars
+    tofu apply -var-file=secrets.tfvars {{ARGS}}
