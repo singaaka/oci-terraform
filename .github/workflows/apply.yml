@@ -22,7 +22,7 @@ jobs:
 
       - name: Decrypt secrets
         env:
-          AGE_PASSPHRASE: ${{ secrets.AGE_PASSPHRASE }}
+          AGE_IDENTITY: ${{ secrets.AGE_IDENTITY }}
         run: just decrypt
 
       - name: Init
