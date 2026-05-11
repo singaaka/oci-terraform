@@ -43,3 +43,11 @@ apply *ARGS:
     export AWS_ACCESS_KEY_ID=$(grep '^access_key' secrets.tfvars | awk -F'"' '{print $2}')
     export AWS_SECRET_ACCESS_KEY=$(grep '^secret_key' secrets.tfvars | awk -F'"' '{print $2}')
     tofu apply -var-file=secrets.tfvars {{ ARGS }}
+
+# Destroy the configuration; extra flags are forwarded (e.g. just apply -auto-approve)
+destroy *ARGS:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    export AWS_ACCESS_KEY_ID=$(grep '^access_key' secrets.tfvars | awk -F'"' '{print $2}')
+    export AWS_SECRET_ACCESS_KEY=$(grep '^secret_key' secrets.tfvars | awk -F'"' '{print $2}')
+    tofu destroy -var-file=secrets.tfvars {{ ARGS }}
