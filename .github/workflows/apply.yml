@@ -11,14 +11,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: extractions/setup-just@v2
+      - uses: extractions/setup-just@v4
 
       - name: Install age
         run: sudo apt-get install -y age
 
-      - uses: opentofu/setup-opentofu@v1
+      - uses: opentofu/setup-opentofu@v2
 
       - name: Decrypt secrets
         env:
