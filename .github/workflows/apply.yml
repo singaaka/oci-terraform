@@ -1,10 +1,10 @@
 name: Terraform Apply
 
-on:
-  schedule:
-    - cron: "*/5 * * * *"
-      timezone: Asia/Kolkata
-  workflow_dispatch:
+#on:
+#  schedule:
+#    - cron: "*/5 * * * *"
+#      timezone: Asia/Kolkata
+#  workflow_dispatch:
 
 jobs:
   apply:
